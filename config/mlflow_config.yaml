@@ -1,0 +1,118 @@
+# MLflow Configuration
+# ====================
+
+mlflow:
+  # Tracking Server
+  tracking_uri: "sqlite:///mlflow.db"
+  artifact_root: "./mlartifacts"
+  
+  # Experiment Configuration
+  experiment_name: "wheelchair_voice_control"
+  
+  # Model Registry
+  registry_uri: null  # Use same as tracking_uri if null
+  
+  # Autologging
+  autolog:
+    enabled: true
+    log_models: true
+    log_input_examples: true
+    log_model_signatures: true
+    silent: false
+  
+  # Tags (default tags for all runs)
+  default_tags:
+    project: "wheelchair_voice_control"
+    version: "3.0.0"
+    environment: "development"
+    team: "maestria_ia"
+  
+  # Run Configuration
+  run:
+    nested: false
+    log_system_metrics: true
+  
+  # Artifact Logging
+  artifacts:
+    log_models: true
+    log_datasets: true
+    log_plots: true
+    log_code: true
+  
+  # Metrics
+  metrics:
+    # Voice Recognition Metrics
+    voice:
+      - accuracy
+      - precision
+      - recall
+      - f1_score
+      - confidence_mean
+      - confidence_std
+      - latency_ms_mean
+      - latency_ms_p95
+      - latency_ms_p99
+    
+    # Connection Metrics
+    connection:
+      - connection_success_rate
+      - connection_time_ms_mean
+      - disconnection_count
+      - reconnection_count
+    
+    # System Metrics
+    system:
+      - cpu_usage_percent
+      - memory_usage_mb
+      - uptime_hours
+  
+  # Parameters to Track
+  parameters:
+    # Model Parameters
+    model:
+      - model_type
+      - model_version
+      - sample_rate
+      - language
+      - engine
+    
+    # System Parameters
+    system:
+      - connection_type
+      - baudrate
+      - timeout
+      - buffer_size
+    
+    # Voice Parameters
+    voice:
+      - vosk_model_path
+      - confidence_threshold
+      - silence_timeout
+      - phrase_time_limit
+
+# Model Registry Configuration
+model_registry:
+  # Staging
+  staging:
+    approval_required: false
+    min_accuracy: 0.85
+    max_latency_ms: 300
+  
+  # Production
+  production:
+    approval_required: true
+    min_accuracy: 0.90
+    max_latency_ms: 200
+    min_test_samples: 100
+  
+  # Archiving
+  archive:
+    auto_archive_days: 90
+    keep_versions: 5
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/mlflow.log"
+  console: true

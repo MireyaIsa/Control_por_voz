@@ -1,0 +1,227 @@
+# Model Configuration
+# ===================
+
+# Voice Recognition Models
+voice_recognition:
+  # Vosk (Offline)
+  vosk:
+    enabled: true
+    model_path: "vosk-model-small-es-0.42"
+    sample_rate: 16000
+    language: "es"
+    confidence_threshold: 0.6
+    
+    # Audio Processing
+    audio:
+      channels: 1
+      dtype: "int16"
+      blocksize: 8000
+      buffer_size: 4096
+    
+    # Recognition Settings
+    recognition:
+      enable_words: true
+      enable_partial_results: true
+      max_alternatives: 1
+  
+  # Google Speech Recognition (Online)
+  google:
+    enabled: true
+    language: "es-ES"
+    confidence_threshold: 0.7
+    
+    # Audio Settings
+    audio:
+      timeout: 2
+      phrase_time_limit: 3
+      ambient_noise_duration: 0.3
+    
+    # API Settings
+    api:
+      show_all: false
+      with_confidence: true
+
+# Command Processing
+command_processing:
+  # Valid Commands
+  commands:
+    directions:
+      - "adelante"
+      - "atrás"
+      - "izquierda"
+      - "derecha"
+      - "adelante derecha"
+      - "adelante izquierda"
+      - "atrás derecha"
+      - "atrás izquierda"
+    
+    stop:
+      - "detener"
+      - "alto"
+      - "parar"
+      - "stop"
+    
+    speeds:
+      - "lento"
+      - "medio"
+      - "rápido"
+  
+  # Command Mapping
+  mapping:
+    directions:
+      "adelante": 0
+      "adelante derecha": 45
+      "derecha": 90
+      "atrás derecha": 135
+      "atrás": 180
+      "atrás izquierda": 225
+      "izquierda": 270
+      "adelante izquierda": 315
+    
+    speeds:
+      "lento": 0.5
+      "medio": 0.75
+      "rápido": 1.0
+      "default": 0.5
+  
+  # Processing Settings
+  processing:
+    normalize_text: true
+    remove_accents: false
+    lowercase: true
+    timeout_ms: 5000
+
+# Joystick Configuration
+joystick:
+  # Virtual Joystick
+  virtual:
+    max_radius: 150
+    deadzone_radius: 30
+    center_x: 200
+    center_y: 200
+    
+    # Direction Sectors (16 directions)
+    sectors: 16
+    sector_angle: 22.5
+  
+  # Physical Joystick
+  physical:
+    enabled: true
+    update_rate_ms: 100
+    
+    # Calibration
+    calibration:
+      auto_calibrate: true
+      deadzone: 0.05
+      max_value: 1.0
+
+# Connection Configuration
+connection:
+  # Serial/USB
+  serial:
+    baudrate: 115200
+    timeout: 0.1
+    write_timeout: 0.1
+    bytesize: 8
+    parity: "N"
+    stopbits: 1
+    xonxoff: false
+    rtscts: false
+    dsrdtr: false
+  
+  # Bluetooth
+  bluetooth:
+    device_name: "ESP32_Wheelchair_BT"
+    rfcomm_port: 1
+    timeout: 10
+    reconnect_attempts: 3
+    reconnect_delay_s: 2
+  
+  # Communication
+  communication:
+    send_rate_ms: 100
+    read_rate_ms: 50
+    command_format: "JOY,{angle:.2f},{magnitude:.3f}\n"
+    
+    # Timeouts
+    connection_timeout_s: 10
+    command_timeout_ms: 500
+    response_timeout_ms: 1000
+
+# Safety Configuration
+safety:
+  # Movement Limits
+  limits:
+    max_speed: 1.0
+    min_speed: 0.3
+    emergency_stop_enabled: true
+  
+  # Timeouts
+  timeouts:
+    command_timeout_ms: 500
+    connection_lost_timeout_s: 5
+    auto_stop_timeout_ms: 1000
+  
+  # Validation
+  validation:
+    validate_commands: true
+    validate_angles: true
+    validate_magnitudes: true
+    
+    # Ranges
+    angle_range: [0.0, 360.0]
+    magnitude_range: [0.0, 1.0]
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  
+  # Metrics Collection
+  metrics:
+    collection_interval_s: 60
+    window_size: 100
+    
+    # Thresholds
+    thresholds:
+      accuracy_min: 0.80
+      confidence_min: 0.60
+      latency_max_ms: 500
+  
+  # Alerts
+  alerts:
+    enabled: true
+    email_notifications: false
+    log_alerts: true
+    
+    # Alert Levels
+    levels:
+      - "low"
+      - "medium"
+      - "high"
+      - "critical"
+
+# Data Collection
+data_collection:
+  enabled: true
+  
+  # Storage
+  storage:
+    raw_data_path: "data/raw"
+    processed_data_path: "data/processed"
+    
+    # Formats
+    voice_commands_format: "csv"
+    joystick_data_format: "csv"
+    connection_logs_format: "json"
+  
+  # Sampling
+  sampling:
+    voice_commands: 1.0  # 100% of commands
+    joystick_data: 0.1   # 10% of joystick updates
+    connection_events: 1.0  # 100% of connection events
+  
+  # Retention
+  retention:
+    raw_data_days: 30
+    processed_data_days: 90
+    logs_days: 7

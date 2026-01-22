@@ -1,0 +1,63 @@
+name: MLflow Model Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_version:
+        description: 'Model version to deploy'
+        required: true
+        default: 'latest'
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    name: Deploy Model
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Configure MLflow
+      env:
+        MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+      run: |
+        echo "MLflow tracking URI configured"
+    
+    - name: Validate model
+      run: |
+        python scripts/validate_model.py --version ${{ github.event.inputs.model_version }}
+    
+    - name: Deploy to ${{ github.event.inputs.environment }}
+      env:
+        MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        ENVIRONMENT: ${{ github.event.inputs.environment }}
+      run: |
+        python scripts/deploy_model.py \
+          --version ${{ github.event.inputs.model_version }} \
+          --environment ${{ github.event.inputs.environment }}
+    
+    - name: Run smoke tests
+      run: |
+        python scripts/smoke_test.py --environment ${{ github.event.inputs.environment }}
+    
+    - name: Notify deployment
+      if: success()
+      run: |
+        echo "Model ${{ github.event.inputs.model_version }} deployed to ${{ github.event.inputs.environment }}"
